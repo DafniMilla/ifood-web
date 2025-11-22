@@ -1,98 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import EsqueceuSenha from './EsqueceuSenha';
-import Cadastro from '../cadastro/FormCadastro';
 
-export default function FormLogin() {
+export default function EsqueceuSenha({ onBackToLogin }) {
   const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [showCadastro, setShowCadastro] = useState(false);
-
-  // Verifica hash na URL
-  useEffect(() => {
-    //Detecta se tem #esqueceu-senha na URL
-    if (window.location.hash === '#esqueceu-senha') {
-      setShowForgotPassword(true);
-    }
-    //Detecta se tem #cadastro na URL
-    if (window.location.hash === '#cadastro') {
-      setShowCadastro(true);
-    }
-  }, []);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+    setSuccess(false);
+
     // Validação simples
-    if (!email.trim() || !senha.trim()) {
-      setError('Preencha todos os campos');
+    if (!email.trim()) {
+      setError('Informe seu e-mail');
+      return;
+    }
+
+    if (!email.includes('@')) {
+      setError('E-mail inválido');
       return;
     }
 
     setLoading(true);
 
     try {
-      const authenticationRequest = {
-        username: email,
-        password: senha,
+      const resetRequest = {
+        email: email,
       };
 
-      const response = await axios.post('/login',
-        authenticationRequest
+      const response = await axios.post(
+        '',
+        resetRequest
       );
 
-      // Sucesso - você pode adicionar lógica aqui para salvar o token
-      // registerSuccessfulLoginForJwt(response.data.token, response.data.tokenExpiresIn);
-      // navigate("/home");
-      
-      console.log('Login realizado com sucesso:', response.data);
+      // Sucesso - exibe mensagem de confirmação
+      setSuccess(true);
+      console.log('E-mail de recuperação enviado:', response.data);
       
     } catch (err) {
       if (err.response) {
-        setError(err.response.data?.message || 'Usuário não encontrado');
+        setError(err.response.data?.message || 'Erro ao enviar e-mail de recuperação');
       } else if (err.request) {
         setError('Erro ao conectar com o servidor. Verifique sua conexão.');
       } else {
-        setError('Erro ao realizar login. Tente novamente.');
+        setError('Erro ao processar solicitação. Tente novamente.');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Se mostrar tela de cadastro
-  if (showCadastro) {
-    return (
-      <Cadastro 
-        onBackToLogin={() => {
-          window.location.hash = '';
-          setShowCadastro(false);
-        }} 
-      />
-    );
-  }
-
-  // Se mostrar tela de esqueceu senha
-  if (showForgotPassword) {
-    return (
-      //Se showForgotPassword === true o componente de login inteiro é substituído por <EsqueceuSenha />
-      <EsqueceuSenha 
-        onBackToLogin={() => {
-          window.location.hash = '';
-          setShowForgotPassword(false);
-        }} 
-      />
-    );
-  }
-
   return (
-    <Container fluid className="login-container">
+    <Container fluid className="forgot-password-container">
       <Row className="h-100">
         {/* Lado Esquerdo - Estilo Visual */}
         <Col md={6} className="left-panel d-none d-md-flex">
@@ -101,35 +64,39 @@ export default function FormLogin() {
               <h1 className="logo-text">iFood</h1>
             </div>
             <div className="content-section">
-              <h2 className="title">Venda mais com seu restaurante no iFood</h2>
+              <h2 className="title">Recupere sua senha</h2>
               <p className="subtitle">
-                Clientes a um clique de distância e seu negócio vendendo como nunca
+                Não se preocupe! Vamos te ajudar a recuperar o acesso à sua conta
               </p>
               <div className="features">
                 <div className="feature-item">
-                  <span className="feature-icon">🚀</span>
-                  <span>Aumente suas vendas</span>
+                  <span className="feature-icon">🔐</span>
+                  <span>Recuperação segura</span>
                 </div>
                 <div className="feature-item">
-                  <span className="feature-icon">📱</span>
-                  <span>Gerencie seus pedidos</span>
+                  <span className="feature-icon">📧</span>
+                  <span>E-mail de recuperação</span>
                 </div>
                 <div className="feature-item">
-                  <span className="feature-icon">💰</span>
-                  <span>Receba pagamentos online</span>
+                  <span className="feature-icon">⚡</span>
+                  <span>Processo rápido e fácil</span>
                 </div>
               </div>
             </div>
           </div>
         </Col>
 
-        {/* Lado Direito - Formulário de Login */}
+        {/* Lado Direito - Formulário */}
         <Col md={6} className="right-panel d-flex align-items-center justify-content-center">
-          <Card className="login-card">
+          <Card className="forgot-password-card">
             <Card.Body className="p-4">
               <div className="text-center mb-4">
-                <h2 className="login-title">Entrar</h2>
-                <p className="login-subtitle">Acesse sua conta para continuar</p>
+                <h2 className="forgot-password-title">Esqueceu sua senha?</h2>
+                <p className="forgot-password-subtitle">
+                  {success 
+                    ? 'Verifique sua caixa de entrada' 
+                    : 'Digite seu e-mail e enviaremos um link para redefinir sua senha'}
+                </p>
               </div>
 
               {error && (
@@ -138,77 +105,76 @@ export default function FormLogin() {
                 </div>
               )}
 
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>E-mail</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Informe seu e-mail"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    maxLength={100}
-                    className="form-control-custom"
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-4">
-                  <Form.Label>Senha</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Digite sua senha"
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    required
-                    maxLength={100}
-                    className="form-control-custom"
-                  />
-                </Form.Group>
-
-                <div className="d-grid mb-3">
-                  <Button
-                    type="submit"
-                    variant="danger"
-                    size="lg"
-                    className="login-button"
-                    disabled={loading}
-                  >
-                    {loading ? 'Entrando...' : 'Entrar'}
-                  </Button>
+              {success ? (
+                <div className="success-message">
+                  <div className="alert alert-success" role="alert">
+                    <div className="success-icon">✓</div>
+                    <div>
+                      <strong>E-mail enviado com sucesso!</strong>
+                      <p className="mb-0 mt-2">
+                        Enviamos um link de recuperação para <strong>{email}</strong>.
+                        Verifique sua caixa de entrada e siga as instruções.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="d-grid mt-4">
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => {
+                        setSuccess(false);
+                        setEmail('');
+                      }}
+                    >
+                      Enviar novamente
+                    </Button>
+                  </div>
                 </div>
+              ) : (
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-4">
+                    <Form.Label>E-mail</Form.Label>
+                    <Form.Control
+                      type="email"
+                      placeholder="Informe seu e-mail cadastrado"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      maxLength={100}
+                      className="form-control-custom"
+                    />
+                  </Form.Group>
 
-                <div className="text-center">
-                  <a 
-                    href="#esqueceu-senha" 
-                    className="forgot-password-link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.location.hash = '#esqueceu-senha';
-                      setShowForgotPassword(true);
-                    }}
-                  >
-                    Esqueceu sua senha?
-                  </a>
-                </div>
-              </Form>
+                  <div className="d-grid mb-3">
+                    <Button
+                      type="submit"
+                      variant="danger"
+                      size="lg"
+                      className="forgot-password-button"
+                      disabled={loading}
+                    >
+                      {loading ? 'Enviando...' : 'Enviar link de recuperação'}
+                    </Button>
+                  </div>
+                </Form>
+              )}
 
               <div className="divider my-4">
                 <span>ou</span>
               </div>
 
               <div className="text-center">
-                <p className="signup-text">
-                  Não tem uma conta?{' '}
+                <p className="back-login-text">
+                  Lembrou sua senha?{' '}
                   <a 
-                    href="#cadastro" 
-                    className="signup-link"
+                    href="#" 
+                    className="back-login-link" 
                     onClick={(e) => {
                       e.preventDefault();
-                      window.location.hash = '#cadastro';
-                      setShowCadastro(true);
+                      window.location.hash = '';
+                      if (onBackToLogin) onBackToLogin();
                     }}
                   >
-                    Cadastre-se
+                    Voltar para o login
                   </a>
                 </p>
               </div>
@@ -219,14 +185,14 @@ export default function FormLogin() {
 
       {/* CSS Styles */}
       <style>{`
-        .login-container {
+        .forgot-password-container {
           height: 100vh;
           padding: 0;
           margin: 0;
           overflow: hidden;
         }
 
-        .login-container .row {
+        .forgot-password-container .row {
           margin: 0;
         }
 
@@ -317,7 +283,7 @@ export default function FormLogin() {
           padding: 2rem;
         }
 
-        .login-card {
+        .forgot-password-card {
           width: 100%;
           max-width: 450px;
           border: none;
@@ -326,14 +292,14 @@ export default function FormLogin() {
           background: white;
         }
 
-        .login-title {
+        .forgot-password-title {
           font-size: 2rem;
           font-weight: 700;
           color: #212529;
           margin-bottom: 0.5rem;
         }
 
-        .login-subtitle {
+        .forgot-password-subtitle {
           color: #6c757d;
           font-size: 0.95rem;
           margin: 0;
@@ -352,7 +318,7 @@ export default function FormLogin() {
           box-shadow: 0 0 0 0.2rem rgba(234, 29, 44, 0.25);
         }
 
-        .login-button {
+        .forgot-password-button {
           background-color: #ea1d2c;
           border: none;
           border-radius: 8px;
@@ -362,28 +328,31 @@ export default function FormLogin() {
           transition: all 0.3s ease;
         }
 
-        .login-button:hover {
+        .forgot-password-button:hover {
           background-color: #c70909;
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(234, 29, 44, 0.4);
         }
 
-        .login-button:disabled {
+        .forgot-password-button:disabled {
           background-color: #ea1d2c;
           opacity: 0.7;
           transform: none;
         }
 
-        .forgot-password-link {
-          color: #ea1d2c;
-          text-decoration: none;
-          font-size: 0.9rem;
-          transition: color 0.3s ease;
+        .success-message .alert-success {
+          border-radius: 8px;
+          border: none;
+          background-color: #d4edda;
+          color: #155724;
+          padding: 1.5rem;
         }
 
-        .forgot-password-link:hover {
-          color: #c70909;
-          text-decoration: underline;
+        .success-icon {
+          font-size: 2rem;
+          color: #28a745;
+          font-weight: bold;
+          margin-bottom: 0.5rem;
         }
 
         .divider {
@@ -416,20 +385,21 @@ export default function FormLogin() {
           font-size: 0.9rem;
         }
 
-        .signup-text {
+        .back-login-text {
           color: #6c757d;
           font-size: 0.95rem;
           margin: 0;
         }
 
-        .signup-link {
+        .back-login-link {
           color: #ea1d2c;
           text-decoration: none;
           font-weight: 600;
           transition: color 0.3s ease;
+          cursor: pointer;
         }
 
-        .signup-link:hover {
+        .back-login-link:hover {
           color: #c70909;
           text-decoration: underline;
         }
@@ -449,7 +419,7 @@ export default function FormLogin() {
             padding: 1rem;
           }
 
-          .login-card {
+          .forgot-password-card {
             max-width: 100%;
           }
 
@@ -463,7 +433,7 @@ export default function FormLogin() {
         }
 
         @media (max-width: 576px) {
-          .login-title {
+          .forgot-password-title {
             font-size: 1.75rem;
           }
 
