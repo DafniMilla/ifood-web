@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import EsqueceuSenha from './EsqueceuSenha';
+import { useEffect, useState } from 'react';
+import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import Cadastro from '../cadastro/FormCadastro';
+import EsqueceuSenha from './EsqueceuSenha';
 
 export default function FormLogin() {
   const [email, setEmail] = useState('');
@@ -39,11 +39,11 @@ export default function FormLogin() {
 
     try {
       const authenticationRequest = {
-        username: email,
+        email: email,
         password: senha,
       };
 
-      const response = await axios.post('/login',
+      const response = await axios.post("http://localhost:8081/auth/login",
         authenticationRequest
       );
 
@@ -84,7 +84,7 @@ export default function FormLogin() {
       //Se showForgotPassword === true o componente de login inteiro é substituído por <EsqueceuSenha />
       <EsqueceuSenha 
         onBackToLogin={() => {
-          window.location.hash = '';
+          window.location.hash = "";
           setShowForgotPassword(false);
         }} 
       />
