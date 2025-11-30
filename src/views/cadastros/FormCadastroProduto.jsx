@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 export default function FormCadastro() {
   return (
     <Container className="mt-5">
-      <h1>Teste de Cadastro</h1>
+      <h1>Teste de Cadastro de produto</h1>
     </Container>
   );
 }

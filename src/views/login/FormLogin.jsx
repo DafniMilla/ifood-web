@@ -2,7 +2,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import Cadastro from '../cadastro/FormCadastro';
+import FormCadastroDonoRest from '../cadastros/FormCadastroDonoRest';
 import EsqueceuSenha from './EsqueceuSenha';
 
 export default function FormLogin() {
@@ -69,7 +69,7 @@ export default function FormLogin() {
   // Se mostrar tela de cadastro
   if (showCadastro) {
     return (
-      <Cadastro 
+      <FormCadastroDonoRest 
         onBackToLogin={() => {
           window.location.hash = '';
           setShowCadastro(false);
