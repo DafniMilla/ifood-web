@@ -37,13 +37,10 @@ export default function FormCadastroRest() {
     <div style={styles.page}>
       <div style={styles.container}>
 
-        {/* TÍTULO */}
         <h1 style={styles.titulo}>Cadastro do Restaurante</h1>
 
-        {/* ERRO */}
         {erro && <p style={styles.erro}>{erro}</p>}
 
-        {/* INPUTS */}
         <label style={styles.label}>Nome do Restaurante</label>
         <input style={styles.input} value={nome} onChange={(e) => setNome(e.target.value)} />
 
@@ -56,7 +53,6 @@ export default function FormCadastroRest() {
         <label style={styles.label}>Raio de Entrega (km)</label>
         <input style={styles.input} value={raio} onChange={(e) => setRaio(e.target.value)} />
 
-        {/* BOTÃO COM ANIMAÇÃO IGUAL AO LOGIN */}
         <button
           style={styles.btn}
           onMouseEnter={(e) => (e.target.style.transform = "translateY(-2px)")}
@@ -66,7 +62,6 @@ export default function FormCadastroRest() {
           Concluir cadastro
         </button>
 
-        {/* LINK VOLTAR */}
         <p style={styles.voltar}>
           <span onClick={() => navigate("/login")} style={styles.voltarLink}>
             ← Voltar para o login
@@ -75,7 +70,6 @@ export default function FormCadastroRest() {
 
       </div>
 
-      {/* ESTILO INLINE COMPLEMENTAR */}
       <style>{`
         button {
           transition: all 0.3s ease;
@@ -85,9 +79,6 @@ export default function FormCadastroRest() {
   );
 }
 
-/* =============================== */
-/*            ESTILIZAÇÃO          */
-/* =============================== */
 
 const styles = {
   page: {

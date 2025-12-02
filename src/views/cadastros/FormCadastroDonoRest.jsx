@@ -1,5 +1,6 @@
-import { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function FormCadastroDonoRest({ onBackToLogin }) {
   const [nome, setNome] = useState("");
@@ -10,6 +11,7 @@ export default function FormCadastroDonoRest({ onBackToLogin }) {
   const [password, setPassword] = useState("");
   const [repPassword, setRepPassword] = useState("");
   const [erro, setErro] = useState("");
+  const navigate = useNavigate();
 
   async function cadastrar() {
     if (!nome || !cpf || !email || !password || !fone || !dtNascimento)
@@ -39,9 +41,11 @@ export default function FormCadastroDonoRest({ onBackToLogin }) {
 
       const id_usuario = res.data.idUsuario;
 
-      // Envia o id para o FormCadastroRest
-      if (onBackToLogin) onBackToLogin("cadastroRest", id_usuario);
 
+     
+
+      // Envia o id para o FormCadastroRest
+navigate("/cadastroRest", { state: { id_usuario } });
     } catch (e) {
       console.log(e);
       setErro("Erro ao cadastrar dono");
