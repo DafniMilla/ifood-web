@@ -18,7 +18,7 @@ export default function FormCadastroRest() {
       return setErro("Preencha todos os campos");
 
     try {
-      await axios.post("http://localhost:8080/restaurante/cadastrar", {
+      await axios.post("http://localhost:8081/restaurante", {
         nome,
         telefone,
         cnpj,

@@ -33,7 +33,7 @@ export default function FormCadastroDonoRest({ onBackToLogin }) {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/usuario/dono/cadastrar",
+        "http://localhost:8081/auth/registro",
         payload
       );
 

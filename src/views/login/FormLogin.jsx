@@ -2,10 +2,14 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { data, useNavigate } from "react-router-dom";
 import FormCadastroDonoRest from '../cadastros/FormCadastroDonoRest';
 import EsqueceuSenha from './EsqueceuSenha';
 
 export default function FormLogin() {
+
+  const navigate = useNavigate(); 
+
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,21 +19,20 @@ export default function FormLogin() {
 
   // Verifica hash na URL
   useEffect(() => {
-    //Detecta se tem #esqueceu-senha na URL
     if (window.location.hash === '#esqueceu-senha') {
       setShowForgotPassword(true);
     }
-    //Detecta se tem #cadastro na URL
     if (window.location.hash === '#cadastro') {
       setShowCadastro(true);
     }
+
   }, []);
 
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    // Validação simples
+
     if (!email.trim() || !senha.trim()) {
       setError('Preencha todos os campos');
       return;
@@ -43,16 +46,16 @@ export default function FormLogin() {
         password: senha,
       };
 
-      const response = await axios.post("http://localhost:8081/auth/login",
+      const response = await axios.post(
+        "http://localhost:8081/auth/login",
         authenticationRequest
       );
-
-      // Sucesso - você pode adicionar lógica aqui para salvar o token
-      // registerSuccessfulLoginForJwt(response.data.token, response.data.tokenExpiresIn);
-      // navigate("/home");
-      
       console.log('Login realizado com sucesso:', response.data);
-      
+
+      const token  = response.data;
+      localStorage.setItem("token",token)
+     navigate("/telaprincipal")
+
     } catch (err) {
       if (err.response) {
         setError(err.response.data?.message || 'Usuário não encontrado');
@@ -66,27 +69,24 @@ export default function FormLogin() {
     }
   };
 
-  // Se mostrar tela de cadastro
   if (showCadastro) {
     return (
-      <FormCadastroDonoRest 
+      <FormCadastroDonoRest
         onBackToLogin={() => {
           window.location.hash = '';
           setShowCadastro(false);
-        }} 
+        }}
       />
     );
   }
 
-  // Se mostrar tela de esqueceu senha
   if (showForgotPassword) {
     return (
-      //Se showForgotPassword === true o componente de login inteiro é substituído por <EsqueceuSenha />
-      <EsqueceuSenha 
+      <EsqueceuSenha
         onBackToLogin={() => {
           window.location.hash = "";
           setShowForgotPassword(false);
-        }} 
+        }}
       />
     );
   }
@@ -94,7 +94,7 @@ export default function FormLogin() {
   return (
     <Container fluid className="login-container">
       <Row className="h-100">
-        {/* Lado Esquerdo - Estilo Visual */}
+        {/* Lado Esquerdo */}
         <Col md={6} className="left-panel d-none d-md-flex">
           <div className="left-content">
             <div className="logo-section">
@@ -123,7 +123,7 @@ export default function FormLogin() {
           </div>
         </Col>
 
-        {/* Lado Direito - Formulário de Login */}
+        {/* Lado Direito - Formulário */}
         <Col md={6} className="right-panel d-flex align-items-center justify-content-center">
           <Card className="login-card">
             <Card.Body className="p-4">
@@ -178,8 +178,8 @@ export default function FormLogin() {
                 </div>
 
                 <div className="text-center">
-                  <a 
-                    href="#esqueceu-senha" 
+                  <a
+                    href="#esqueceu-senha"
                     className="forgot-password-link"
                     onClick={(e) => {
                       e.preventDefault();
@@ -199,8 +199,8 @@ export default function FormLogin() {
               <div className="text-center">
                 <p className="signup-text">
                   Não tem uma conta?{' '}
-                  <a 
-                    href="#cadastro" 
+                  <a
+                    href="#cadastro"
                     className="signup-link"
                     onClick={(e) => {
                       e.preventDefault();
@@ -216,6 +216,7 @@ export default function FormLogin() {
           </Card>
         </Col>
       </Row>
+
 
       {/* CSS Styles */}
       <style>{`
@@ -475,3 +476,4 @@ export default function FormLogin() {
     </Container>
   );
 }
+
