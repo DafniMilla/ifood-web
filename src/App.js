@@ -7,6 +7,10 @@ import FormCadastroDonoRest from "./views/cadastros/FormCadastroDonoRest";
 import FormCadastroProduto from "./views/cadastros/FormCadastroProduto";
 import EsqueceuSenha from "./views/login/EsqueceuSenha";
 
+import Pedidos from "./views/pedidos/Pedidos";
+import Perfil from "./views/perfil/Perfil";
+import Produtos from "./views/produtos/Produto";
+
 function App() {
   return (
     <Router>
@@ -17,6 +21,9 @@ function App() {
         <Route path="/cadastroProduto" element={<FormCadastroProduto />} />
         <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
         <Route path="/telaprincipal" element={<TelaPrincipal />} />
+        <Route path="/pedidos" element={<Pedidos />} />
+        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/produtos" element={<Produtos />} />
       </Routes>
     </Router>
   );

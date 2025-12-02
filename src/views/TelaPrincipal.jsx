@@ -1,10 +1,9 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
-import { NavLink, Routes, Route } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export default function TelaPrincipal() {
-
   const historicoPedidos = [
     {
       id_pedido: 101,
@@ -36,87 +35,72 @@ export default function TelaPrincipal() {
         <h3 className="fw-bold text-center mb-5">iFood 2.0</h3>
 
         <NavLink
-          to="pedidos"
+          to="/pedidos"
           className={({ isActive }) =>
             `menu-link mb-3 ${isActive ? "menu-active" : ""}`
           }
         >
-           Meus Pedidos
+          Meus Pedidos
         </NavLink>
 
         <NavLink
-          to="perfil"
+          to="/perfil"
           className={({ isActive }) =>
             `menu-link mb-3 ${isActive ? "menu-active" : ""}`
           }
         >
-           Perfil do Restaurante
+          Perfil do Restaurante
         </NavLink>
 
         <NavLink
-          to="produtos"
+          to="/produtos"
           className={({ isActive }) =>
             `menu-link mb-3 ${isActive ? "menu-active" : ""}`
           }
         >
-           Produtos
+          Produtos
         </NavLink>
       </aside>
 
-      {/* CONTEÚDO */}
+      {/* CONTEÚDO PADRÃO DA TELA PRINCIPAL */}
       <main className="flex-grow-1 p-4 bg-light">
         <Container fluid>
+          <h2 className="mb-4 fw-bold">Histórico de Pedidos</h2>
 
-          <Routes>
-  {/* ROTA PADRÃO (quando abrir a tela principal) */}
-  <Route
-    index
-    element={
-      <>
-        <h2 className="mb-4 fw-bold">Histórico de Pedidos</h2>
-        <Row>
-          {historicoPedidos.map((pedido) => (
-            <Col md={6} lg={4} key={pedido.id_pedido} className="mb-4">
-              <Card className="shadow-sm border-0 rounded-4">
-                <Card.Body>
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <Card.Title className="mb-0">
-                      Pedido #{pedido.id_pedido}
-                    </Card.Title>
-                    <span className="badge bg-secondary text-capitalize px-3 py-2 rounded-pill">
-                      {pedido.status}
-                    </span>
-                  </div>
+          <Row>
+            {historicoPedidos.map((pedido) => (
+              <Col md={6} lg={4} key={pedido.id_pedido} className="mb-4">
+                <Card className="shadow-sm border-0 rounded-4">
+                  <Card.Body>
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <Card.Title className="mb-0">
+                        Pedido #{pedido.id_pedido}
+                      </Card.Title>
+                      <span className="badge bg-secondary text-capitalize px-3 py-2 rounded-pill">
+                        {pedido.status}
+                      </span>
+                    </div>
 
-                  <Card.Text>
-                    <strong>Restaurante:</strong> {pedido.restaurante}
-                    <br />
-                    <strong>Data:</strong> {pedido.data_pedido}
-                    <br />
-                    <strong>Total:</strong> {pedido.valor_total}
-                  </Card.Text>
+                    <Card.Text>
+                      <strong>Restaurante:</strong> {pedido.restaurante}
+                      <br />
+                      <strong>Data:</strong> {pedido.data_pedido}
+                      <br />
+                      <strong>Total:</strong> {pedido.valor_total}
+                    </Card.Text>
 
-                  <Button variant="danger" className="w-100 rounded-pill">
-                    Ver detalhes
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </>
-    }
-  />
-
-  {/* ROTAS DO MENU */}
-  <Route path="pedidos" element={<div>Pedidos</div>} />
-  <Route path="perfil" element={<h2>Perfil do Restaurante</h2>} />
-  <Route path="produtos" element={<h2>Lista de Produtos</h2>} />
-</Routes>
-
+                    <Button variant="danger" className="w-100 rounded-pill">
+                      Ver detalhes
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
         </Container>
       </main>
 
+      {/* ESTILOS */}
       <style>{`
         .menu-link {
           text-decoration: none;
