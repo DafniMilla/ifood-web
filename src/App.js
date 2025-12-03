@@ -9,7 +9,9 @@ import EsqueceuSenha from "./views/login/EsqueceuSenha";
 
 import Pedidos from "./views/pedidos/Pedidos";
 import Perfil from "./views/perfil/Perfil";
-import Produtos from "./views/produtos/Produto";
+
+import ProdutoNovo from "./views/produtos/ProdutoNovo";
+import Cardapio from "./views/produtos/Cardapio";
 
 function App() {
   return (
@@ -20,10 +22,15 @@ function App() {
         <Route path="/cadastroDonoRest" element={<FormCadastroDonoRest />} />
         <Route path="/cadastroProduto" element={<FormCadastroProduto />} />
         <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
+
+        {/* painel principal */}
         <Route path="/telaprincipal" element={<TelaPrincipal />} />
         <Route path="/pedidos" element={<Pedidos />} />
         <Route path="/perfil" element={<Perfil />} />
-        <Route path="/produtos" element={<Produtos />} />
+
+        {/* produtos */}
+        <Route path="/produtos/novo" element={<ProdutoNovo />} />
+        <Route path="/produtos/cardapio" element={<Cardapio />} />
       </Routes>
     </Router>
   );

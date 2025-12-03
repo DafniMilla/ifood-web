@@ -52,14 +52,24 @@ export default function TelaPrincipal() {
           Perfil do Restaurante
         </NavLink>
 
-        <NavLink
-          to="/produtos"
-          className={({ isActive }) =>
-            `menu-link mb-3 ${isActive ? "menu-active" : ""}`
-          }
-        >
-          Produtos
-        </NavLink>
+       <NavLink
+  to="/produtos/novo"
+  className={({ isActive }) =>
+    `menu-link mb-3 ${isActive ? "menu-active" : ""}`
+  }
+>
+  Cadastrar Produtos
+</NavLink>
+
+<NavLink
+  to="/produtos/cardapio"
+  className={({ isActive }) =>
+    `menu-link mb-3 ${isActive ? "menu-active" : ""}`
+  }
+>
+  Cardápio
+</NavLink>
+
       </aside>
 
       {/* CONTEÚDO PADRÃO DA TELA PRINCIPAL */}

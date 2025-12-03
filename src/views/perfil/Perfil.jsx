@@ -1,175 +1,91 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Card, Container, Form, Row, Col, Spinner } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Card, Container, Row, Col, Button, Spinner } from "react-bootstrap";
 
-export default function Perfil() {
-  const navigate = useNavigate();
-
+export default function PerfilRestaurante() {
   const [dados, setDados] = useState(null);
-  const [editando, setEditando] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState("");
 
+  // Pegando token salvo no login
   const token = localStorage.getItem("token");
 
-  // Carregar dados do restaurante
   useEffect(() => {
-    if (!token) {
-      navigate("/");
-      return;
-    }
-
     async function carregarDados() {
       try {
-        const resp = await axios.get(
-          "http://localhost:8081/restaurante", //verificar se tem essa rota
+        const response = await axios.get(
+          "http://localhost:8081/restaurante/perfil",
           {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
           }
         );
-        setDados(resp.data);
+
+        setDados(response.data);
       } catch (err) {
         console.error(err);
-        alert("Erro ao carregar perfil");
+        setErro("Erro ao carregar dados do perfil");
       } finally {
         setLoading(false);
       }
     }
 
     carregarDados();
-  }, [token, navigate]);
+  }, [token]);
 
-  // Salvar alterações
-  async function salvarAlteracoes(e) {
-    e.preventDefault();
-    try {
-      const resp = await axios.put(
-        "http://localhost:8081/restaurante/atualizar", //verificar rota
-        dados,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert("Perfil atualizado com sucesso!");
-      setEditando(false);
-      setDados(resp.data);
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao atualizar perfil");
-    }
-  }
-
-  // Logout
-  function sair() {
-    localStorage.removeItem("token");
-    navigate("/");
-  }
-
-  if (loading) {
+  if (loading)
     return (
       <div className="d-flex justify-content-center mt-5">
         <Spinner animation="border" variant="danger" />
       </div>
     );
-  }
 
-  if (!dados) return null;
+  if (erro)
+    return (
+      <p className="text-center text-danger mt-4">
+        {erro}
+      </p>
+    );
+
+  if (!dados)
+    return (
+      <p className="text-center mt-4 text-muted">
+        Nenhum dado encontrado.
+      </p>
+    );
 
   return (
-    <Container className="mt-4">
-      <Card className="shadow-sm p-4 border-0">
-        <h3 className="fw-bold mb-3 text-danger">Perfil do Restaurante</h3>
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col md={8}>
+          <Card className="shadow-sm p-4">
 
-        <Form onSubmit={salvarAlteracoes}>
-          <Row>
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Nome do Restaurante</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={dados.nome || ""}
-                  disabled={!editando}
-                  onChange={(e) => setDados({ ...dados, nome: e.target.value })}
-                />
-              </Form.Group>
-            </Col>
+            <h2 className="text-center mb-4 text-danger">Perfil do Restaurante</h2>
 
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  value={dados.email || ""}
-                  disabled={!editando}
-                  onChange={(e) => setDados({ ...dados, email: e.target.value })}
-                />
-              </Form.Group>
-            </Col>
+            <h4 className="mt-3">📌 Informações do Restaurante</h4>
+            <p><strong>Nome:</strong> {dados.restaurante.nome}</p>
+            <p><strong>CNPJ:</strong> {dados.restaurante.cnpj}</p>
+            <p><strong>Telefone:</strong> {dados.restaurante.telefone}</p>
+            <p><strong>Raio de entrega:</strong> {dados.restaurante.raio_entrega} km</p>
 
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>CNPJ</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={dados.cnpj || ""}
-                  disabled
-                />
-              </Form.Group>
-            </Col>
+            <hr />
 
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Telefone</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={dados.telefone || ""}
-                  disabled={!editando}
-                  onChange={(e) => setDados({ ...dados, telefone: e.target.value })}
-                />
-              </Form.Group>
-            </Col>
+            <h4 className="mt-3">👤 Dono do Restaurante</h4>
+            <p><strong>Nome:</strong> {dados.usuario.nome}</p>
+            <p><strong>Email:</strong> {dados.usuario.email}</p>
+            <p><strong>CPF:</strong> {dados.usuario.cpf}</p>
+            <p><strong>Telefone:</strong> {dados.usuario.foneCelular}</p>
 
-            <Col md={12}>
-              <Form.Group className="mb-3">
-                <Form.Label>Endereço</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={dados.endereco || ""}
-                  disabled={!editando}
-                  onChange={(e) => setDados({ ...dados, endereco: e.target.value })}
-                />
-              </Form.Group>
-            </Col>
-
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Horário de Funcionamento</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={dados.horario || ""}
-                  disabled={!editando}
-                  onChange={(e) => setDados({ ...dados, horario: e.target.value })}
-                />
-              </Form.Group>
-            </Col>
-          </Row>
-
-          {/* Botões */}
-          <div className="d-flex justify-content-between mt-4">
-            {!editando ? (
-              <Button variant="danger" onClick={() => setEditando(true)}>
+            <div className="text-center mt-4">
+              <Button variant="danger" size="lg">
                 Editar Perfil
               </Button>
-            ) : (
-              <Button type="submit" variant="success">
-                Salvar Alterações
-              </Button>
-            )}
+            </div>
 
-            <Button variant="outline-danger" onClick={sair}>
-              Sair da Conta
-            </Button>
-          </div>
-        </Form>
-      </Card>
+          </Card>
+        </Col>
+      </Row>
     </Container>
   );
 }
