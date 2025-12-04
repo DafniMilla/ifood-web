@@ -52,7 +52,7 @@ export default function FormLogin() {
       );
       console.log('Login realizado com sucesso:', response.data);
 
-      const token  = response.data;
+      const token  = response.data.token;
       localStorage.setItem("token",token)
      navigate("/telaprincipal")
 
