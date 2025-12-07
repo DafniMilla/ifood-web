@@ -29,45 +29,59 @@ export default function FormLogin() {
   }, []);
 
  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
 
-    if (!email.trim() || !senha.trim()) {
-      setError('Preencha todos os campos');
-      return;
+  if (!email.trim() || !senha.trim()) {
+    setError('Preencha todos os campos');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+const authenticationRequest = {
+  email: email,
+  password: senha,
+};
+
+const response = await axios.post(
+  "http://localhost:8081/auth/login",
+  authenticationRequest
+);
+
+console.log("Login realizado com sucesso:", response.data);
+
+
+const id_usuario = response.data.id;
+
+
+const respRest = await axios.get(
+  `http://localhost:8081/restaurante/usuario/${id_usuario}`
+);
+
+
+if (respRest.data) {
+  navigate("/telaprincipal");
+}
+
+else {
+  navigate("/cadastro-restaurante", { state: { id_usuario } });
+}
+
+  } catch (err) {
+    if (err.response) {
+      setError(err.response.data?.message || 'Usuário não encontrado');
+    } else if (err.request) {
+      setError('Erro ao conectar com o servidor. Verifique sua conexão.');
+    } else {
+      setError('Erro ao realizar login. Tente novamente.');
     }
-
-    setLoading(true);
-
-    try {
-      const authenticationRequest = {
-        email: email,
-        password: senha,
-      };
-
-      const response = await axios.post(
-        "http://localhost:8081/auth/login",
-        authenticationRequest
-      );
-      console.log('Login realizado com sucesso:', response.data);
-
-      const token  = response.data.token;
-      localStorage.setItem("token",token)
-     navigate("/telaprincipal")
-
-    } catch (err) {
-      if (err.response) {
-        setError(err.response.data?.message || 'Usuário não encontrado');
-      } else if (err.request) {
-        setError('Erro ao conectar com o servidor. Verifique sua conexão.');
-      } else {
-        setError('Erro ao realizar login. Tente novamente.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (showCadastro) {
     return (

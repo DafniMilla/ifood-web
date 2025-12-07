@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate } from "react-router-dom";
 
 export default function FormCadastroDonoRest({ onBackToLogin }) {
   const [nome, setNome] = useState("");
@@ -11,10 +11,19 @@ export default function FormCadastroDonoRest({ onBackToLogin }) {
   const [password, setPassword] = useState("");
   const [repPassword, setRepPassword] = useState("");
   const [erro, setErro] = useState("");
+  const location = useLocation();
   const navigate = useNavigate();
+  const id_usuario = location.state?.id_usuario;
+  const [rua, setRua] = useState("");
+  const [numero, setNumero] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
+  const [cep, setCep] = useState("");
+
 
   async function cadastrar() {
-    if (!nome || !cpf || !email || !password || !fone || !dtNascimento)
+    if (!nome || !cpf || !email || !password || !fone || !dtNascimento || !rua || !numero || !bairro || !cidade || !estado || !cep)
       return setErro("Preencha todos os campos");
 
     if (!email.includes("@")) return setErro("O e-mail deve conter @");
@@ -29,27 +38,34 @@ export default function FormCadastroDonoRest({ onBackToLogin }) {
       cpf,
       email,
       password,
-      foneCelular: fone,
-      dtNascimento,
+      dt_nascimento: dtNascimento,  
+    fone_celular: fone,      
+      endereco: {
+          rua,
+          numero,
+          bairro,
+          cidade,
+          estado,
+          cep,
+        }
+
     };
 
-    try {
-      const res = await axios.post(
-        "http://localhost:8081/auth/registro",
-        payload
-      );
+try {
+  const res = await axios.post(
+    "http://localhost:8081/auth/registro",
+    payload
+  );
 
-      const id_usuario = res.data.idUsuario;
+  const id_usuario = res.data.idUsuario;
 
+  // volta para a tela de login do FormLogin
+  onBackToLogin();
 
-     
-
-      // Envia o id para o FormCadastroRest
-navigate("/cadastroRest", { state: { id_usuario } });
-    } catch (e) {
-      console.log(e);
-      setErro("Erro ao cadastrar dono");
-    }
+} catch (e) {
+  console.log(e);
+  setErro("Erro ao cadastrar dono");
+}
   }
 
   return (
@@ -93,8 +109,30 @@ navigate("/cadastroRest", { state: { id_usuario } });
         <input style={styles.input} type="password" value={repPassword} onChange={(e) => setRepPassword(e.target.value)} />
       </div>
 
+        <h3 style={{ marginTop: 20 }}>Endereço</h3>
+
+        <label style={styles.label}>Rua</label>
+        <input style={styles.input} value={rua} onChange={(e) => setRua(e.target.value)} />
+
+        <label style={styles.label}>Número</label>
+        <input style={styles.input} value={numero} onChange={(e) => setNumero(e.target.value)} />
+
+        <label style={styles.label}>Bairro</label>
+        <input style={styles.input} value={bairro} onChange={(e) => setBairro(e.target.value)} />
+
+        <label style={styles.label}>Cidade</label>
+        <input style={styles.input} value={cidade} onChange={(e) => setCidade(e.target.value)} />
+
+        <label style={styles.label}>Estado</label>
+        <input style={styles.input} value={estado} onChange={(e) => setEstado(e.target.value)} />
+
+        <label style={styles.label}>CEP</label>
+        <input style={styles.input} value={cep} onChange={(e) => setCep(e.target.value)} />
+
+
+
       <button style={styles.btn} onClick={cadastrar}>
-        Próximo →
+        Cadastrar
       </button>
 
       <button

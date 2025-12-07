@@ -4,7 +4,6 @@ import TelaPrincipal from "./views/TelaPrincipal";
 import FormLogin from "./views/login/FormLogin";
 import FormCadastroRest from "./views/cadastros/FormCadastroRest";
 import FormCadastroDonoRest from "./views/cadastros/FormCadastroDonoRest";
-import FormCadastroProduto from "./views/cadastros/FormCadastroProduto";
 import EsqueceuSenha from "./views/login/EsqueceuSenha";
 
 import Pedidos from "./views/pedidos/Pedidos";
@@ -20,7 +19,6 @@ function App() {
         <Route path="/" element={<FormLogin />} />
         <Route path="/cadastroRest" element={<FormCadastroRest />} />
         <Route path="/cadastroDonoRest" element={<FormCadastroDonoRest />} />
-        <Route path="/cadastroProduto" element={<FormCadastroProduto />} />
         <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
 
         {/* painel principal */}

@@ -2,12 +2,33 @@ import { useState } from "react";
 import axios from "axios";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
 
+  const styles = {
+  label: {
+    marginBottom: 6,
+    display: "block",
+  },
+    input: {
+    width: "100%",
+    padding: 13,
+    marginBottom: 15,
+    border: "1px solid #dee2e6",
+    borderRadius: 10,
+    fontSize: 15,
+    transition: "0.3s",
+  },
+
+  }
+
+
+
 export default function ProdutoNovo() {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState("");
   const [categoria, setCategoria] = useState("");
   const [ativo, setAtivo] = useState(true);
+  const [imagem, setImagem] = useState(null);
+  
 
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
@@ -17,44 +38,55 @@ export default function ProdutoNovo() {
   // ------------------------------------------
   // CADASTRAR PRODUTO
   // ------------------------------------------
-  async function cadastrarProduto(e) {
-    e.preventDefault();
-    setErro("");
-    setSucesso("");
+async function cadastrarProduto(e) {
+  e.preventDefault();
+  setErro("");
+  setSucesso("");
 
-    if (!nome || !descricao || !preco || !categoria) {
-      return setErro("Preencha todos os campos!");
-    }
+  // validações
+  if (!nome || !descricao || !preco || !categoria)
+    return setErro("Preencha todos os campos!");
 
-    try {
-      const payload = {
-        nome,
-        descricao,
-        preco: parseFloat(preco),
-        categoria,  // categoria digitada livremente
-        ativo,
-      };
+  if (!imagem)
+    return setErro("Envie uma imagem do produto!");
 
-      await axios.post("http://localhost:8081/produto", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  try {
+    const dados = {
+      nome,
+      descricao,
+      preco: parseFloat(preco),
+      categoria,
+      ativo,
+    };
 
-      setSucesso("Produto cadastrado com sucesso!");
+    const formData = new FormData();
+    formData.append("dados", new Blob([JSON.stringify(dados)], { type: "application/json" }));
+    formData.append("imagem", imagem);
 
-      // limpa o form
-      setNome("");
-      setDescricao("");
-      setPreco("");
-      setCategoria("");
-      setAtivo(true);
+    const token = localStorage.getItem("token");
 
-    } catch (e) {
-      console.error(e);
-      setErro(e.response?.data?.message || "Erro ao cadastrar produto.");
-    }
+    await axios.post("http://localhost:8081/produtos", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    setSucesso("Produto cadastrado com sucesso!");
+
+    // limpa os campos
+    setNome("");
+    setDescricao("");
+    setPreco("");
+    setCategoria("");
+    setAtivo(true);
+    setImagem(null);
+
+  } catch (e) {
+    console.error(e);
+    setErro(e.response?.data?.message || "Erro ao cadastrar produto.");
   }
+}
 
   return (
     <Container className="mt-4">
@@ -71,6 +103,14 @@ export default function ProdutoNovo() {
             {sucesso && <div className="alert alert-success">{sucesso}</div>}
 
             <Form onSubmit={cadastrarProduto}>
+
+              <label style={styles.label}>Imagem do produto</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImagem(e.target.files[0])}
+                style={styles.input}
+              />
 
               <Form.Group className="mb-3">
                 <Form.Label>Nome do Produto</Form.Label>
