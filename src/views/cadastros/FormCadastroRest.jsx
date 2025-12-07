@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -11,22 +11,76 @@ export default function FormCadastroRest() {
   const [telefone, setTelefone] = useState("");
   const [cnpj, setCnpj] = useState("");
   const [raio, setRaio] = useState("");
+
+  // endereço
+  const [rua, setRua] = useState("");
+  const [numero, setNumero] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
+  const [cep, setCep] = useState("");
+
+  // categorias
+  const [categorias, setCategorias] = useState([]);
+  const [categoriaId, setCategoriaId] = useState("");
+
+  // imagem
+  const [imagem, setImagem] = useState(null);
+
   const [erro, setErro] = useState("");
 
+  // pega as catergorias 
+  useEffect(() => {
+    async function carregarCategorias() {
+      try {
+        const resposta = await axios.get("http://localhost:8081/categorias/restaurantes");
+        setCategorias(resposta.data);
+      } catch (e) {
+        console.log("Erro ao carregar categorias", e);
+      }
+    }
+    carregarCategorias();
+  }, []);
+
   async function cadastrar() {
-    if (!nome || !telefone || !cnpj || !raio)
-      return setErro("Preencha todos os campos");
+    if (!nome || !telefone || !cnpj || !raio || !categoriaId || !rua || !numero || !bairro || !cidade || !estado || !cep)
+      return setErro("Preencha todos os campos obrigatórios");
+
+    if (!imagem)
+      return setErro("Envie uma imagem do restaurante!");
 
     try {
-      await axios.post("http://localhost:8081/restaurante", {
+      // montar objeto de dados igual ao RestauranteRequest
+      const dados = {
         nome,
         telefone,
         cnpj,
         raio_entrega: raio,
-        id_usuario,
-      });
+        categoriaId,
+        idUsuario: id_usuario,
+        endereco: {
+          rua,
+          numero,
+          bairro,
+          cidade,
+          estado,
+          cep,
+        }
+      };
+
+      const formData = new FormData();
+      formData.append("dados", new Blob([JSON.stringify(dados)], { type: "application/json" }));
+      formData.append("imagem", imagem);
+       const token = localStorage.getItem("token")
+    await axios.post("http://localhost:8081/restaurante", formData, {
+    headers: {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "multipart/form-data"
+  }
+});
 
       navigate("/telaprincipal");
+      
     } catch (e) {
       console.log(e);
       setErro("Erro ao cadastrar restaurante");
@@ -48,37 +102,58 @@ export default function FormCadastroRest() {
         <input style={styles.input} value={telefone} onChange={(e) => setTelefone(e.target.value)} />
 
         <label style={styles.label}>CNPJ</label>
-        <input style={styles.input} maxLength={14} value={cnpj} onChange={(e) => setCnpj(e.target.value)} />
+        <input style={styles.input} maxLength={18} value={cnpj} onChange={(e) => setCnpj(e.target.value)} />
 
         <label style={styles.label}>Raio de Entrega (km)</label>
         <input style={styles.input} value={raio} onChange={(e) => setRaio(e.target.value)} />
 
-        <button
-          style={styles.btn}
-          onMouseEnter={(e) => (e.target.style.transform = "translateY(-2px)")}
-          onMouseLeave={(e) => (e.target.style.transform = "translateY(0)")}
-          onClick={cadastrar}
-        >
+        {/* Seleção de categoria */}
+        <label style={styles.label}>Categoria</label>
+        <select style={styles.input} value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}>
+          <option value="">Selecione...</option>
+          {categorias.map((cat) => (
+            <option key={cat.id} value={cat.id}>{cat.nome}</option>
+          ))}
+        </select>
+
+        {/*  Endereço */}
+        <h3 style={{ marginTop: 20 }}>Endereço</h3>
+
+        <label style={styles.label}>Rua</label>
+        <input style={styles.input} value={rua} onChange={(e) => setRua(e.target.value)} />
+
+        <label style={styles.label}>Número</label>
+        <input style={styles.input} value={numero} onChange={(e) => setNumero(e.target.value)} />
+
+        <label style={styles.label}>Bairro</label>
+        <input style={styles.input} value={bairro} onChange={(e) => setBairro(e.target.value)} />
+
+        <label style={styles.label}>Cidade</label>
+        <input style={styles.input} value={cidade} onChange={(e) => setCidade(e.target.value)} />
+
+        <label style={styles.label}>Estado</label>
+        <input style={styles.input} value={estado} onChange={(e) => setEstado(e.target.value)} />
+
+        <label style={styles.label}>CEP</label>
+        <input style={styles.input} value={cep} onChange={(e) => setCep(e.target.value)} />
+
+        {/*  Upload da imagem */}
+        <label style={styles.label}>Imagem do Restaurante</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImagem(e.target.files[0])}
+          style={styles.input}
+        />
+
+        <button style={styles.btn} onClick={cadastrar}>
           Concluir cadastro
         </button>
 
-        <p style={styles.voltar}>
-          <span onClick={() => navigate("/login")} style={styles.voltarLink}>
-            ← Voltar para o login
-          </span>
-        </p>
-
       </div>
-
-      <style>{`
-        button {
-          transition: all 0.3s ease;
-        }
-      `}</style>
     </div>
   );
 }
-
 
 const styles = {
   page: {
@@ -138,16 +213,5 @@ const styles = {
     color: "#b70000",
     marginBottom: 15,
     textAlign: "center",
-  },
-  voltar: {
-    textAlign: "center",
-    marginTop: 18,
-  },
-  voltarLink: {
-    color: "#ea1d2c",
-    fontWeight: "600",
-    fontSize: 15,
-    cursor: "pointer",
-    textDecoration: "none",
   },
 };
