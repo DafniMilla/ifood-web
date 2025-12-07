@@ -57,27 +57,25 @@ console.log("Login realizado com sucesso:", response.data);
 const id_usuario = response.data.id;
 
 
-const respRest = await axios.get(
-  `http://localhost:8081/restaurante/usuario/${id_usuario}`
-);
+let restauranteExiste = false;
 
+try {
+  const respRest = await axios.get(
+    `http://localhost:8081/restaurante/usuario/${id_usuario}`
+  );
+  restauranteExiste = respRest.data ? true : false;
+} catch (e) {
+  restauranteExiste = false; // usuário sem restaurante
+}
 
-if (respRest.data) {
+if (restauranteExiste) {
   navigate("/telaprincipal");
+} else {
+  navigate("/cadastroRest", { state: { id_usuario } });
 }
-
-else {
-  navigate("/cadastro-restaurante", { state: { id_usuario } });
-}
-
-  } catch (err) {
-    if (err.response) {
-      setError(err.response.data?.message || 'Usuário não encontrado');
-    } else if (err.request) {
-      setError('Erro ao conectar com o servidor. Verifique sua conexão.');
-    } else {
-      setError('Erro ao realizar login. Tente novamente.');
-    }
+  } catch (error) {
+    setError('Erro ao fazer login. Tente novamente.');
+    console.error('Erro no login:', error);
   } finally {
     setLoading(false);
   }
