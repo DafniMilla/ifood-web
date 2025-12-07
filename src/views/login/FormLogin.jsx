@@ -70,8 +70,10 @@ try {
 
 if (restauranteExiste) {
   navigate("/telaprincipal");
+  
 } else {
   navigate("/cadastroRest", { state: { id_usuario } });
+  localStorage.setItem("token", response.data.token);
 }
   } catch (error) {
     setError('Erro ao fazer login. Tente novamente.');
