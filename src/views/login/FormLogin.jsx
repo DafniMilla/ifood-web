@@ -65,11 +65,12 @@ try {
   );
   restauranteExiste = respRest.data ? true : false;
 } catch (e) {
-  restauranteExiste = false; // usuário sem restaurante
+  restauranteExiste = false; 
 }
 
 if (restauranteExiste) {
   navigate("/telaprincipal");
+  localStorage.setItem("token", response.data.token);
   
 } else {
   navigate("/cadastroRest", { state: { id_usuario } });
