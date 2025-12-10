@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Row, Col, Card, Button, Badge } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
 
 export default function Cardapio() {
   const [produtos, setProdutos] = useState([]);
@@ -10,7 +10,7 @@ export default function Cardapio() {
 
   async function carregarProdutos() {
     try {
-      const response = await axios.get("http://localhost:8081/produto", {
+      const response = await axios.get("http://localhost:8081/produtos", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
