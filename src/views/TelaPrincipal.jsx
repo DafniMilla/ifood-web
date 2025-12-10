@@ -37,14 +37,7 @@ export default function TelaPrincipal() {
       >
         <h3 className="fw-bold text-center mb-5">iFood 2.0</h3>
 
-        <NavLink
-          to="/pedidos"
-          className={({ isActive }) =>
-            `menu-link mb-3 ${isActive ? "menu-active" : ""}`
-          }
-        >
-          Meus Pedidos
-        </NavLink>
+        
 
         <NavLink
           to="/perfil"
