@@ -1,6 +1,6 @@
-import { useState } from "react";
 import axios from "axios";
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import { useState } from "react";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 
   const styles = {
   label: {
@@ -65,7 +65,7 @@ async function cadastrarProduto(e) {
 
     const token = localStorage.getItem("token");
 
-    await axios.post("http://localhost:8081/produtos", formData, {
+    await axios.post("http://localhost:8081/produtos/criar", formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
