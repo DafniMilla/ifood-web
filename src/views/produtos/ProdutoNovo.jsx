@@ -65,7 +65,7 @@ async function cadastrarProduto(e) {
 
     const token = localStorage.getItem("token");
 
-    await axios.post("http://localhost:8081/produtos", formData, {
+    await axios.post("http://localhost:8081/produtos/criar", formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
