@@ -14,7 +14,7 @@ export default function PerfilRestaurante() {
   const logout = () => {
     if (!window.confirm("Deseja sair da sua conta?")) return;
     localStorage.clear();
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   /* ================= EXCLUIR ================= */
