@@ -89,86 +89,146 @@ async function cadastrarProduto(e) {
 }
 
   return (
-    <Container className="mt-4">
-      <Row>
-        <Col md={12}>
-          <h2 className="fw-bold text-danger">Cadastrar Novo Produto</h2>
-          <p className="text-muted">Adicione um novo item ao seu cardápio.</p>
-          <hr />
-        </Col>
+  <Container className="mt-5 mb-5">
+    <Row className="justify-content-center">
+      <Col lg={8}>
+        {/* HEADER */}
+        <Card className="border-0 shadow rounded-4 mb-4">
+          <Card.Body className="p-4">
+            <h2 className="fw-bold text-danger mb-1">
+              Cadastrar Novo Produto
+            </h2>
+            <p className="text-muted mb-0">
+              Adicione um novo item ao seu cardápio
+            </p>
+          </Card.Body>
+        </Card>
 
-        <Col md={6}>
-          <Card className="p-4 shadow-sm">
-            {erro && <div className="alert alert-danger">{erro}</div>}
-            {sucesso && <div className="alert alert-success">{sucesso}</div>}
+        {/* FORMULÁRIO */}
+        <Card className="border-0 shadow rounded-4">
+          <Card.Body className="p-4">
+            {erro && (
+              <div className="alert alert-danger rounded-3">
+                {erro}
+              </div>
+            )}
+            {sucesso && (
+              <div className="alert alert-success rounded-3">
+                {sucesso}
+              </div>
+            )}
 
             <Form onSubmit={cadastrarProduto}>
-
-              <label style={styles.label}>Imagem do produto</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImagem(e.target.files[0])}
-                style={styles.input}
-              />
-
-              <Form.Group className="mb-3">
-                <Form.Label>Nome do Produto</Form.Label>
+              {/* IMAGEM */}
+              <Form.Group className="mb-4">
+                <Form.Label className="fw-semibold">
+                  Imagem do Produto
+                </Form.Label>
                 <Form.Control
-                  type="text"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImagem(e.target.files[0])}
+                  className="rounded-3"
                 />
+                <Form.Text className="text-muted">
+                  Utilize imagens em boa resolução
+                </Form.Text>
               </Form.Group>
 
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label className="fw-semibold">
+                      Nome do Produto
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Ex: X-Burger"
+                      value={nome}
+                      onChange={(e) => setNome(e.target.value)}
+                      className="rounded-3"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label className="fw-semibold">
+                      Categoria
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Lanche, Bebida, Sobremesa..."
+                      value={categoria}
+                      onChange={(e) => setCategoria(e.target.value)}
+                      className="rounded-3"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
               <Form.Group className="mb-3">
-                <Form.Label>Descrição</Form.Label>
+                <Form.Label className="fw-semibold">
+                  Descrição
+                </Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
+                  placeholder="Descreva o produto"
                   value={descricao}
                   onChange={(e) => setDescricao(e.target.value)}
+                  className="rounded-3"
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Preço</Form.Label>
-                <Form.Control
-                  type="number"
-                  step="0.01"
-                  value={preco}
-                  onChange={(e) => setPreco(e.target.value)}
-                />
-              </Form.Group>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label className="fw-semibold">
+                      Preço
+                    </Form.Label>
+                    <Form.Control
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={preco}
+                      onChange={(e) => setPreco(e.target.value)}
+                      className="rounded-3"
+                    />
+                  </Form.Group>
+                </Col>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Categoria</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Ex: Lanche, Bebida, Sobremesa..."
-                  value={categoria}
-                  onChange={(e) => setCategoria(e.target.value)}
-                />
-              </Form.Group>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label className="fw-semibold">
+                      Status
+                    </Form.Label>
+                    <Form.Select
+                      value={ativo}
+                      onChange={(e) =>
+                        setAtivo(e.target.value === "true")
+                      }
+                      className="rounded-3"
+                    >
+                      <option value="true">Ativo</option>
+                      <option value="false">Desativado</option>
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Status</Form.Label>
-                <Form.Select
-                  value={ativo}
-                  onChange={(e) => setAtivo(e.target.value === "true")}
-                >
-                  <option value="true">Ativo</option>
-                  <option value="false">Desativado</option>
-                </Form.Select>
-              </Form.Group>
-
-              <Button variant="danger" type="submit" className="w-100">
+              <Button
+                variant="danger"
+                type="submit"
+                className="w-100 rounded-pill py-2 fw-bold mt-3"
+              >
                 Salvar Produto
               </Button>
             </Form>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
-  );
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  </Container>
+);
 }
