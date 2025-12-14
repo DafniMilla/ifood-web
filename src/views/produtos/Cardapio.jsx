@@ -86,7 +86,7 @@ export default function Cardapio() {
   async function excluirProduto() {
     try {
       await axios.delete(
-        `${API_URL}/produtos/${produtoSelecionado.idProduto}`,
+        `${API_URL}/produtos/deletar/${produtoSelecionado.idProduto}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setShowExcluir(false);
