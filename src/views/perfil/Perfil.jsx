@@ -11,7 +11,7 @@ export default function PerfilRestaurante() {
   const[id, setId] = useState("");
 
   const token = localStorage.getItem("token");
-
+  const [id, setId] = useState("");
   /* ================= LOGOUT ================= */
   const logout = () => {
     if (!window.confirm("Deseja sair da sua conta?")) return;
@@ -24,7 +24,11 @@ export default function PerfilRestaurante() {
     if (!window.confirm("Tem certeza que deseja excluir o restaurante?")) return;
 
     try {
+<<<<<<< HEAD
       await axios.delete(`http://localhost:8081/restaurante/${id}`, {
+=======
+      await axios.delete(`http://localhost:8081/restaurante/${id}` , {
+>>>>>>> 25f60a7e1e48efccf2adfa77b65731f96ab538bd
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -70,7 +74,9 @@ export default function PerfilRestaurante() {
 
   /* ================= CARREGAR DADOS ================= */
   const carregarDados = async () => {
+
     try {
+
       const response = await axios.get("http://localhost:8081/restaurante", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -199,6 +205,21 @@ export default function PerfilRestaurante() {
 
             {/* ================= DONO ================= */}
             <Card className="p-3 mb-3 border-0 shadow-sm">
+
+              <div className="d-flex justify-content-end mb-2">
+                {!editando && (
+                  <i
+                    className="bi bi-pencil fs-2 text-warning me-3"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setEditando(true)}
+                  />
+                )}
+                <i
+                  className="bi bi-trash-fill fs-2 text-danger"
+                  style={{ cursor: "pointer" }}
+                  onClick={excluirPerfil}
+                />
+              </div>
               <h4 className="text-danger mb-3">Dono do Restaurante</h4>
 
               <Campo
