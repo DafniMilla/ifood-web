@@ -14,6 +14,7 @@ export default function TelaPrincipal() {
   const [pedidos, setPedidos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
+  const [novoStatus, setNovoStatus] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -25,26 +26,80 @@ export default function TelaPrincipal() {
       .then((response) => {
         const dados = Array.isArray(response.data)
           ? response.data
-          : [response.data];
+          : response.data.content || [];
         setPedidos(dados);
       })
       .catch((error) => {
-        console.log("Erro ao carregar pedidos:", error);
+        console.error("Erro ao carregar pedidos:", error);
       });
   }, []);
 
   const abrirDetalhes = (pedido) => {
     setPedidoSelecionado(pedido);
+    setNovoStatus(pedido.status);
     setShowModal(true);
   };
 
   const fecharDetalhes = () => {
     setShowModal(false);
     setPedidoSelecionado(null);
+    setNovoStatus("");
   };
 
   const quantidadeTotal = (itens = []) =>
     itens.reduce((total, item) => total + item.quantidade, 0);
+
+  const atualizarStatus = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        `http://localhost:8081/pedidos/${pedidoSelecionado.id}/status`,
+        { status: novoStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Atualiza a lista
+      setPedidos((prev) =>
+        prev.map((p) =>
+          p.id === pedidoSelecionado.id
+            ? { ...p, status: novoStatus }
+            : p
+        )
+      );
+
+      setPedidoSelecionado((prev) => ({
+        ...prev,
+        status: novoStatus,
+      }));
+
+      fecharDetalhes();
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+      alert("Erro ao atualizar status do pedido");
+    }
+  };
+
+  const statusColor = (status) => {
+    switch (status) {
+      case "REALIZADO":
+        return "secondary";
+      case "EM_PREPARO":
+        return "warning";
+      case "SAIU_PARA_ENTREGA":
+        return "info";
+      case "ENTREGUE":
+        return "success";
+      case "CANCELADO":
+        return "danger";
+      default:
+        return "dark";
+    }
+  };
 
   return (
     <Container fluid>
@@ -69,9 +124,15 @@ export default function TelaPrincipal() {
                   <br />
 
                   <strong>Total:</strong>{" "}
-                  {pedido.valorTotal !== undefined
-                    ? `R$ ${pedido.valorTotal.toFixed(2)}`
-                    : "-"}
+                  R$ {pedido.valorTotal?.toFixed(2)}
+                  <br />
+
+                  <strong>Status:</strong>{" "}
+                  <span
+                    className={`fw-bold text-${statusColor(pedido.status)}`}
+                  >
+                    {pedido.status}
+                  </span>
                 </Card.Text>
 
                 <Button
@@ -87,98 +148,84 @@ export default function TelaPrincipal() {
         ))}
       </Row>
 
-      {/* MODAL DE DETALHES */}
-<Modal show={showModal} onHide={fecharDetalhes} size="lg" centered>
-  <Modal.Header
-    closeButton
-    className="bg-danger text-white rounded-top"
-  >
-    <Modal.Title className="fw-bold">
-      Detalhes do Pedido #{pedidoSelecionado?.id}
-    </Modal.Title>
-  </Modal.Header>
+      {/* MODAL */}
+      <Modal show={showModal} onHide={fecharDetalhes} size="lg" centered>
+        <Modal.Header closeButton className="bg-danger text-white">
+          <Modal.Title>
+            Pedido #{pedidoSelecionado?.id}
+          </Modal.Title>
+        </Modal.Header>
 
-  <Modal.Body className="bg-light">
-    {pedidoSelecionado?.itens?.map((item, index) => (
-      <Card
-        key={index}
-        className="mb-3 border-0 shadow-sm rounded-4"
-      >
-        <Card.Body>
-          <Row>
-            <Col md={8}>
-              <h5 className="fw-bold mb-2">
-                {item.produto?.nome}
-              </h5>
+        <Modal.Body className="bg-light">
+          {/* STATUS EDITÁVEL */}
+          <div className="mb-4">
+            <label className="fw-bold mb-2">Status do pedido</label>
+            <select
+              className="form-select"
+              value={novoStatus}
+              onChange={(e) => setNovoStatus(e.target.value)}
+            >
+              <option value="REALIZADO">Realizado</option>
+              <option value="EM_PREPARO">Em preparo</option>
+              <option value="SAIU_PARA_ENTREGA">Saiu para entrega</option>
+              <option value="ENTREGUE">Entregue</option>
+              <option value="CANCELADO">Cancelado</option>
+            </select>
+          </div>
 
-              <p className="text-muted mb-1">
-                {item.produto?.descricao}
-              </p>
+          {pedidoSelecionado?.itens?.map((item, index) => (
+            <Card
+              key={index}
+              className="mb-3 border-0 shadow-sm rounded-4"
+            >
+              <Card.Body>
+                <Row>
+                  <Col md={8}>
+                    <h5 className="fw-bold">
+                      {item.produto?.nome}
+                    </h5>
 
-              <p className="mb-1">
-                <strong>Categoria:</strong>{" "}
-                {item.produto?.categoria?.nome}
-              </p>
+                    <p className="text-muted">
+                      {item.produto?.descricao}
+                    </p>
+                  </Col>
 
-              <p className="mb-1">
-                <strong>Status:</strong>{" "}
-                <span
-                  className={
-                    item.produto?.ativo
-                      ? "text-success fw-semibold"
-                      : "text-danger fw-semibold"
-                  }
-                >
-                  {item.produto?.ativo ? "Ativo" : "Inativo"}
-                </span>
-              </p>
-            </Col>
+                  <Col md={4} className="text-end">
+                    <p>
+                      <strong>Qtd:</strong> {item.quantidade}
+                    </p>
 
-            <Col md={4} className="text-md-end mt-3 mt-md-0">
-              <p className="mb-1">
-                <strong>Preço:</strong>
-                <br />
-                R$ {item.produto?.preco?.toFixed(2)}
-              </p>
+                    <p className="fw-bold text-danger">
+                      Subtotal:
+                      <br />
+                      R$ {item.subtotal?.toFixed(2)}
+                    </p>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          ))}
 
-              <p className="mb-1">
-                <strong>Qtd:</strong> {item.quantidade}
-              </p>
+          <hr />
 
-              <p className="fw-bold text-danger">
-                Subtotal:
-                <br />
-                R$ {item.subtotal?.toFixed(2)}
-              </p>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
-    ))}
+          <h4 className="fw-bold text-end">
+            Total:{" "}
+            <span className="text-danger">
+              R$ {pedidoSelecionado?.valorTotal?.toFixed(2)}
+            </span>
+          </h4>
+        </Modal.Body>
 
-    <hr />
+        <Modal.Footer>
+          <Button variant="secondary" onClick={fecharDetalhes}>
+            Fechar
+          </Button>
 
-    <div className="d-flex justify-content-end">
-      <h4 className="fw-bold">
-        Total do pedido:{" "}
-        <span className="text-danger">
-          R$ {pedidoSelecionado?.valorTotal?.toFixed(2)}
-        </span>
-      </h4>
-    </div>
-  </Modal.Body>
-
-  <Modal.Footer className="bg-light">
-    <Button
-      variant="secondary"
-      className="rounded-pill px-4"
-      onClick={fecharDetalhes}
-    >
-      Fechar
-    </Button>
-  </Modal.Footer>
-</Modal>
-
+          <Button variant="danger" onClick={atualizarStatus}>
+            Atualizar status
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 }
