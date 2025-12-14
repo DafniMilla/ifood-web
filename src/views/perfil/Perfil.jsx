@@ -11,7 +11,6 @@ export default function PerfilRestaurante() {
   const[id, setId] = useState("");
 
   const token = localStorage.getItem("token");
-  const [id, setId] = useState("");
   /* ================= LOGOUT ================= */
   const logout = () => {
     if (!window.confirm("Deseja sair da sua conta?")) return;
@@ -24,11 +23,7 @@ export default function PerfilRestaurante() {
     if (!window.confirm("Tem certeza que deseja excluir o restaurante?")) return;
 
     try {
-<<<<<<< HEAD
       await axios.delete(`http://localhost:8081/restaurante/${id}`, {
-=======
-      await axios.delete(`http://localhost:8081/restaurante/${id}` , {
->>>>>>> 25f60a7e1e48efccf2adfa77b65731f96ab538bd
         headers: { Authorization: `Bearer ${token}` },
       });
 
