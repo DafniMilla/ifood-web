@@ -66,16 +66,16 @@ export default function Cardapio() {
   async function editarProduto() {
     try {
       await axios.put(
-        `${API_URL}/produtos/${produtoSelecionado.idProduto}`,
-        {
-          nome: form.nome,
-          descricao: form.descricao,
-          preco: form.preco,
-          ativo: form.ativo,
-          categoria: { idCategoria: form.categoriaId }
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  `${API_URL}/produtos/editar/${produtoSelecionado.idProduto}`,
+  {
+    nome: form.nome,
+    descricao: form.descricao,
+    preco: form.preco,
+    ativo: form.ativo,
+    categoria: produtoSelecionado.categoria?.nome || ""
+  },
+  { headers: { Authorization: `Bearer ${token}` } }
+);
       setShowEditar(false);
       carregarProdutos();
     } catch {
