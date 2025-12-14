@@ -8,6 +8,7 @@ export default function PerfilRestaurante() {
   const [editando, setEditando] = useState(false);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const[id, setId] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -23,7 +24,7 @@ export default function PerfilRestaurante() {
     if (!window.confirm("Tem certeza que deseja excluir o restaurante?")) return;
 
     try {
-      await axios.delete("http://localhost:8081/restaurante/excluir", {
+      await axios.delete(`http://localhost:8081/restaurante/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -73,6 +74,9 @@ export default function PerfilRestaurante() {
       const response = await axios.get("http://localhost:8081/restaurante", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      const id =response.data[0].idRestaurante
+      setId(id);
 
       setRestaurante(response.data[0]);
       setUsuario(response.data[0].usuario);
