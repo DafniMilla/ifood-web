@@ -1,94 +1,102 @@
-import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect, useState } from 'react';
-import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import { data, useNavigate } from "react-router-dom";
-import FormCadastroDonoRest from '../cadastros/FormCadastroDonoRest';
-import EsqueceuSenha from './EsqueceuSenha';
+import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useEffect, useState } from "react";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import FormCadastroDonoRest from "../cadastros/FormCadastroDonoRest";
+import EsqueceuSenha from "./EsqueceuSenha";
 
 export default function FormLogin() {
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); 
-
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showCadastro, setShowCadastro] = useState(false);
 
-  // Verifica hash na URL
+  /* ================= BLOQUEIA LOGIN SE JÁ ESTIVER LOGADO ================= */
   useEffect(() => {
-    if (window.location.hash === '#esqueceu-senha') {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/telaprincipal");
+    }
+  }, [navigate]);
+
+  /* ================= CONTROLE DE HASH ================= */
+  useEffect(() => {
+    if (window.location.hash === "#esqueceu-senha") {
       setShowForgotPassword(true);
     }
-    if (window.location.hash === '#cadastro') {
+    if (window.location.hash === "#cadastro") {
       setShowCadastro(true);
     }
-
   }, []);
 
- 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
+  /* ================= LOGIN ================= */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  if (!email.trim() || !senha.trim()) {
-    setError('Preencha todos os campos');
-    return;
-  }
+    if (!email.trim() || !senha.trim()) {
+      setError("Preencha todos os campos");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-const authenticationRequest = {
-  email: email,
-  password: senha,
-};
+    try {
+      const authenticationRequest = {
+        email,
+        password: senha,
+      };
 
-const response = await axios.post(
-  "http://localhost:8081/auth/login",
-  authenticationRequest
-);
+      const response = await axios.post(
+        "http://localhost:8081/auth/login",
+        authenticationRequest
+      );
 
-console.log("Login realizado com sucesso:", response.data);
+      // ✅ SALVA TOKEN ANTES DE QUALQUER NAVEGAÇÃO
+      localStorage.setItem("token", response.data.token);
 
+      const id_usuario = response.data.id;
+      let restauranteExiste = false;
 
-const id_usuario = response.data.id;
+      try {
+        const respRest = await axios.get(
+          `http://localhost:8081/restaurante/usuario/${id_usuario}`,
+          {
+            headers: {
+              Authorization: `Bearer ${response.data.token}`,
+            },
+          }
+        );
+        restauranteExiste = !!respRest.data;
+      } catch {
+        restauranteExiste = false;
+      }
 
+      if (restauranteExiste) {
+        navigate("/telaprincipal");
+      } else {
+        navigate("/cadastroRest", { state: { id_usuario } });
+      }
+    } catch (err) {
+      console.error("Erro no login:", err);
+      setError("Erro ao fazer login. Tente novamente.");
+      localStorage.removeItem("token");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-let restauranteExiste = false;
-
-try {
-  const respRest = await axios.get(
-    `http://localhost:8081/restaurante/usuario/${id_usuario}`
-  );
-  restauranteExiste = respRest.data ? true : false;
-} catch (e) {
-  restauranteExiste = false; 
-}
-
-if (restauranteExiste) {
-  navigate("/telaprincipal");
-  localStorage.setItem("token", response.data.token);
-  
-} else {
-  navigate("/cadastroRest", { state: { id_usuario } });
-  localStorage.setItem("token", response.data.token);
-}
-  } catch (error) {
-    setError('Erro ao fazer login. Tente novamente.');
-    console.error('Erro no login:', error);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  /* ================= TELAS INTERNAS ================= */
   if (showCadastro) {
     return (
       <FormCadastroDonoRest
         onBackToLogin={() => {
-          window.location.hash = '';
+          window.location.hash = "";
           setShowCadastro(false);
         }}
       />
@@ -106,6 +114,7 @@ if (restauranteExiste) {
     );
   }
 
+  /* ================= TELA ================= */
   return (
     <Container fluid className="login-container">
       <Row className="h-100">
@@ -138,19 +147,22 @@ if (restauranteExiste) {
           </div>
         </Col>
 
-        {/* Lado Direito - Formulário */}
-        <Col md={6} className="right-panel d-flex align-items-center justify-content-center">
+        {/* Lado Direito */}
+        <Col
+          md={6}
+          className="right-panel d-flex align-items-center justify-content-center"
+        >
           <Card className="login-card">
             <Card.Body className="p-4">
               <div className="text-center mb-4">
                 <h2 className="login-title">Entrar</h2>
-                <p className="login-subtitle">Acesse sua conta para continuar</p>
+                <p className="login-subtitle">
+                  Acesse sua conta para continuar
+                </p>
               </div>
 
               {error && (
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
+                <div className="alert alert-danger">{error}</div>
               )}
 
               <Form onSubmit={handleSubmit}>
@@ -188,7 +200,7 @@ if (restauranteExiste) {
                     className="login-button"
                     disabled={loading}
                   >
-                    {loading ? 'Entrando...' : 'Entrar'}
+                    {loading ? "Entrando..." : "Entrar"}
                   </Button>
                 </div>
 
@@ -198,7 +210,7 @@ if (restauranteExiste) {
                     className="forgot-password-link"
                     onClick={(e) => {
                       e.preventDefault();
-                      window.location.hash = '#esqueceu-senha';
+                      window.location.hash = "#esqueceu-senha";
                       setShowForgotPassword(true);
                     }}
                   >
@@ -213,13 +225,13 @@ if (restauranteExiste) {
 
               <div className="text-center">
                 <p className="signup-text">
-                  Não tem uma conta?{' '}
+                  Não tem uma conta?{" "}
                   <a
                     href="#cadastro"
                     className="signup-link"
                     onClick={(e) => {
                       e.preventDefault();
-                      window.location.hash = '#cadastro';
+                      window.location.hash = "#cadastro";
                       setShowCadastro(true);
                     }}
                   >
@@ -232,7 +244,7 @@ if (restauranteExiste) {
         </Col>
       </Row>
 
-
+    
       {/* CSS Styles */}
       <style>{`
         .login-container {
