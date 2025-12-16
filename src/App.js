@@ -7,6 +7,7 @@ import FormLogin from "./views/login/FormLogin";
 import FormCadastroRest from "./views/cadastros/FormCadastroRest";
 import FormCadastroDonoRest from "./views/cadastros/FormCadastroDonoRest";
 import EsqueceuSenha from "./views/login/EsqueceuSenha";
+import TrocarSenha from "./views/login/TrocarSenha";
 
 import TelaPrincipal from "./views/TelaPrincipal";
 
@@ -27,7 +28,7 @@ function App() {
         <Route path="/cadastroRest" element={<FormCadastroRest />} />
         <Route path="/cadastroDonoRest" element={<FormCadastroDonoRest />} />
         <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
-
+        <Route path="/trocar-senha" element={<TrocarSenha />} />
         {/* ROTAS COM MENU */}
         <Route element={<LayoutRestaurante />}>
           <Route path="/telaprincipal" element={<TelaPrincipal />} />
@@ -35,6 +36,7 @@ function App() {
           <Route path="/produtos/novo" element={<ProdutoNovo />} />
           <Route path="/produtos/cardapio" element={<Cardapio />} />
             <Route path="/vendas" element={<Vendas />} />
+          
         </Route>
 
       </Routes>
