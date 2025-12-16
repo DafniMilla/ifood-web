@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Button,
-  Modal,
-} from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Modal } from "react-bootstrap";
 
 export default function TelaPrincipal() {
   const [pedidos, setPedidos] = useState([]);
@@ -27,6 +20,7 @@ export default function TelaPrincipal() {
         const dados = Array.isArray(response.data)
           ? response.data
           : response.data.content || [];
+
         setPedidos(dados);
       })
       .catch((error) => {
@@ -46,9 +40,6 @@ export default function TelaPrincipal() {
     setNovoStatus("");
   };
 
-  const quantidadeTotal = (itens = []) =>
-    itens.reduce((total, item) => total + item.quantidade, 0);
-
   const atualizarStatus = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -57,13 +48,10 @@ export default function TelaPrincipal() {
         `http://localhost:8081/pedidos/${pedidoSelecionado.id}/status`,
         { status: novoStatus },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // Atualiza a lista
       setPedidos((prev) =>
         prev.map((p) =>
           p.id === pedidoSelecionado.id
@@ -110,18 +98,19 @@ export default function TelaPrincipal() {
 
         {pedidos.map((pedido) => (
           <Col md={6} lg={4} className="mb-4" key={pedido.id}>
-            <Card className="shadow-sm border-0 rounded-4">
+            <Card className="shadow-sm border-0 rounded-4 h-100">
               <Card.Body>
                 <Card.Title>Pedido #{pedido.id}</Card.Title>
 
                 <Card.Text>
-                  <strong>Produto:</strong>{" "}
-                  {pedido.itens?.[0]?.produto?.nome || "-"}
-                  <br />
-
-                  <strong>Quantidade:</strong>{" "}
-                  {quantidadeTotal(pedido.itens)}
-                  <br />
+                  <strong>Produtos:</strong>
+                  <ul className="ps-3 mb-2">
+                    {pedido.itens?.map((item, index) => (
+                      <li key={index}>
+                        {item.produto?.nome} (x{item.quantidade})
+                      </li>
+                    ))}
+                  </ul>
 
                   <strong>Total:</strong>{" "}
                   R$ {pedido.valorTotal?.toFixed(2)}
@@ -129,7 +118,9 @@ export default function TelaPrincipal() {
 
                   <strong>Status:</strong>{" "}
                   <span
-                    className={`fw-bold text-${statusColor(pedido.status)}`}
+                    className={`fw-bold text-${statusColor(
+                      pedido.status
+                    )}`}
                   >
                     {pedido.status}
                   </span>
@@ -157,7 +148,6 @@ export default function TelaPrincipal() {
         </Modal.Header>
 
         <Modal.Body className="bg-light">
-          {/* STATUS EDITÁVEL */}
           <div className="mb-4">
             <label className="fw-bold mb-2">Status do pedido</label>
             <select
@@ -184,7 +174,6 @@ export default function TelaPrincipal() {
                     <h5 className="fw-bold">
                       {item.produto?.nome}
                     </h5>
-
                     <p className="text-muted">
                       {item.produto?.descricao}
                     </p>
@@ -194,7 +183,6 @@ export default function TelaPrincipal() {
                     <p>
                       <strong>Qtd:</strong> {item.quantidade}
                     </p>
-
                     <p className="fw-bold text-danger">
                       Subtotal:
                       <br />
@@ -220,7 +208,6 @@ export default function TelaPrincipal() {
           <Button variant="secondary" onClick={fecharDetalhes}>
             Fechar
           </Button>
-
           <Button variant="danger" onClick={atualizarStatus}>
             Atualizar status
           </Button>
